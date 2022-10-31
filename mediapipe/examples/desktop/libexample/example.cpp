@@ -3,7 +3,7 @@
 
 namespace mediapipe {
 
-Example* Example::Create(const std::string& graph) 
+MP_CPP_EXPORT Example* Example::Create(const char* graph) 
 {
     ExampleImpl *example = new ExampleImpl();
     absl::Status status = example->Init(graph);

@@ -25,7 +25,7 @@ ExampleImpl::~ExampleImpl()
     }
 }
 
-absl::Status ExampleImpl::Init(const std::string& graph) 
+absl::Status ExampleImpl::Init(const char* graph) 
 {
     LOG(INFO) << "Parsing graph config " << graph;
     mediapipe::CalculatorGraphConfig config = mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(graph);

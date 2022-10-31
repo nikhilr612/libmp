@@ -12,7 +12,7 @@ public:
     ExampleImpl(){}
     ~ExampleImpl();
 
-    absl::Status Init(const std::string& graph);
+    absl::Status Init(const char* graph);
 
     uint8_t* Process(uint8_t* data, int width, int height) override;
 
