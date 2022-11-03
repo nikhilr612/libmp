@@ -1,21 +1,47 @@
-# Example how to build Mediapipe as dynamic .so library
-New example is added under mediapipe/examples/desktop/libexample which you can build
-and get .so from it, which you can then integrate into any desktop application you wish.
+# MediaPipe Shared Library
 
-You can build the example using following:
+## Integrate MediaPipe into Your C++ Application
 
-`bazel build --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/libexample:libexample.so`
+A new "MediaPipe example" has been added under `mediapipe/examples/desktop/libexample`. Using Bazel, you can build this target. This will create a shared library (`.so` on Linux, `.dll` on Windows), which you can then integrate (along with its `.h` header file) into any C++ application you wish.
 
-Built library will be located under:
 
-`bazel-bin/mediapipe/examples/desktop/libexample/libexample.so`
+## Prerequisites
+### Windows
+1. Install OpenCV
+    - Pre-compiled binaries
+        - Visit https://sourceforge.net/projects/opencvlibrary/files
+        - Click on folder of desired OpenCV version (e.g., 4.6.0)
+        - Download and run the installer `.exe` (e.g., `opencv-4.6.0-vc14_vc15.exe`)
+    - From source
+2. By default, this repository's Bazel build files expect OpenCV to be version `4.6.0` and installed at `C:\opencv`. To match build settings to your own OpenCV version and path, modify the `/third_party/opencv_windows.BUILD` (search for "OPENCV_VERSION") and `/WORKSPACE` (search for "windows_opencv") Bazel files.
 
-Header files that go with libexample.so can be found under mediapipe/examples/desktop/libexample/example.h
+### Linux
+1. Install OpenCV
+    - Pre-compiled binaries: `sudo apt-get install libopencv-core-dev libopencv-imgproc-dev libopencv-imgcodecs-dev`
+    - From source
+2. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager. To match build settings to your own OpenCV version and path, modify the `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION") and `/WORKSPACE` (search for "windows_opencv") Bazel files.
 
-Unused openCV libraries are disabled under third_party/opencv_linux.BUILD. If you need them, reenable them to get
-them linked in the final binary too.
 
-Remember to copy mediapipe/modules and mediapipe/models to wherever the binary is.
+## Building
+### Linux
+1. `git clone` this repository and `cd` into it
+2. Run `bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/libexample:libexample.so`
+### Windows
+1. `git clone` this repository and `cd` into it
+2. Run `build_libexample_win.sh` (Bash) or `build_libexample_win.bat` (CMD, Powershell)
+
+
+## Usage
+- The header file that goes with libexample can be found under `mediapipe/examples/desktop/libexample/example.h`
+- The shared library can be found under
+`bazel-bin/mediapipe/examples/desktop/libexample` as `libexample.so` (Linux) or `libexample.dll` (Windows)
+- On Windows, you will need to either copy `opencv_world###.dll` to your own binary's location or ensure it is in your PATH
+- Copy `bazel-bin/mediapipe/modules` and `bazel-bin/mediapipe/models` to your own binary's location. (It must be from the output directory `bazel-bin`, as the source `mediapipe/modules` and `mediapipe/models` directories are empty.)
+
+
+## Notes
+- Unused OpenCV libraries are disabled in `third_party/opencv_linux.BUILD`. If you need them, you can re-enable them to get them linked in the final binary too.
+- One recent breaking change to MediaPipe is that models (e.g., .tflite files) are no longer included in the repository itself. They are instead hosted on [Google Cloud Storage (GCS)](https://storage.googleapis.com/mediapipe-assets/). If your code is not working for some reason, you can manually clone an older version of the google/mediapipe repository and copy the source `mediapipe/models` and `mediapipe/modules` folders over to your binary's location. See [cc6a2f7](https://github.com/google/mediapipe/tree/cc6a2f7af65977248b2a15f471503da2832f583a) for the last versions of these folders before deletion.
 
 ---
 layout: default
