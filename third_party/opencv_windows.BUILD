@@ -5,8 +5,6 @@ licenses(["notice"])  # BSD license
 
 exports_files(["LICENSE"])
 
-OPENCV_VERSION = "460"  # 4.6.0
-
 config_setting(
     name = "opt_build",
     values = {"compilation_mode": "opt"},
@@ -17,9 +15,15 @@ config_setting(
     values = {"compilation_mode": "dbg"},
 )
 
-# The following build rule assumes that the executable "opencv-4.6.0-vc14_vc15.exe"
-# is downloaded and the files are extracted to local.
-# If you install OpenCV separately, please modify the build rule accordingly.
+# ===== NOTES ===== #
+# The following build rule assumes pre-built binaries for OpenCV v4.6.0 were downloaded
+# and installed. If you installed OpenCV differently, please modify the build rule accordingly.
+#
+# All paths below are relative to the path defined in /WORKSPACE for "windows_opencv"
+# By default this path is C:\opencv\build (double \), but you can change this if necessary.
+
+OPENCV_VERSION = "460"  # 4.6.0
+
 cc_library(
     name = "opencv",
     srcs = select({
