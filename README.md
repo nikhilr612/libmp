@@ -6,20 +6,21 @@ A new "MediaPipe example" has been added under `mediapipe/examples/desktop/libex
 
 
 ## Prerequisites
+### Linux
+1. Install OpenCV
+    - Download pre-compiled binaries: `sudo apt-get install libopencv-core-dev libopencv-imgproc-dev libopencv-imgcodecs-dev`
+    - Alternatively, build from source
+2. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager. To match build settings to your own OpenCV version and path, modify the `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION") and `/WORKSPACE` (search for "windows_opencv") Bazel files.
 ### Windows
 1. Install OpenCV
-    - Pre-compiled binaries
+    - Download pre-compiled binaries
         - Visit https://sourceforge.net/projects/opencvlibrary/files
         - Click on folder of desired OpenCV version (e.g., 4.6.0)
         - Download and run the installer `.exe` (e.g., `opencv-4.6.0-vc14_vc15.exe`)
-    - From source
-2. By default, this repository's Bazel build files expect OpenCV to be version `4.6.0` and installed at `C:\opencv`. To match build settings to your own OpenCV version and path, modify the `/third_party/opencv_windows.BUILD` (search for "OPENCV_VERSION") and `/WORKSPACE` (search for "windows_opencv") Bazel files.
-
-### Linux
-1. Install OpenCV
-    - Pre-compiled binaries: `sudo apt-get install libopencv-core-dev libopencv-imgproc-dev libopencv-imgcodecs-dev`
-    - From source
-2. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager. To match build settings to your own OpenCV version and path, modify the `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION") and `/WORKSPACE` (search for "windows_opencv") Bazel files.
+    - Alternatively, build from source
+2. By default, this repository's Bazel build files expect OpenCV to be version `4.6.0` and installed at `C:\opencv`. To match build settings to your own OpenCV version and path, modify the following Bazel files:
+    - `/third_party/opencv_windows.BUILD` (search for "OPENCV_VERSION")
+    - `/WORKSPACE` (search for "windows_opencv")
 
 
 ## Building
@@ -35,8 +36,8 @@ A new "MediaPipe example" has been added under `mediapipe/examples/desktop/libex
 - The header file that goes with libexample can be found under `mediapipe/examples/desktop/libexample/example.h`
 - The shared library can be found under
 `bazel-bin/mediapipe/examples/desktop/libexample` as `libexample.so` (Linux) or `libexample.dll` (Windows)
-- On Windows, you will need to either copy `opencv_world###.dll` to your own binary's location or ensure it is in your PATH
-- Copy `bazel-bin/mediapipe/modules` and `bazel-bin/mediapipe/models` to your own binary's location. (It must be from the output directory `bazel-bin`, as the source `mediapipe/modules` and `mediapipe/models` directories are empty.)
+    - On Windows, you also need to either copy `opencv_world###.dll` to your binary's output location or otherwise ensure it is in your PATH
+- In your binary's output location, create a `mediapipe` directory. Copy the `modules` and `models` folders from `bazel-bin/mediapipe` into this new directory. (Copy from `bazel-bin/mediapipe`, _NOT_ `mediapipe`, as the latter contains empty source directories.)
 
 
 ## Notes
