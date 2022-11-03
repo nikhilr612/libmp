@@ -33,11 +33,16 @@ A new "MediaPipe example" has been added under `mediapipe/examples/desktop/libex
 
 
 ## Usage
-- The header file that goes with libexample can be found under `mediapipe/examples/desktop/libexample/example.h`
-- The shared library can be found under
-`bazel-bin/mediapipe/examples/desktop/libexample` as `libexample.so` (Linux) or `libexample.dll` (Windows)
-    - On Windows, you also need to either copy `opencv_world###.dll` to your binary's output location or otherwise ensure it is in your PATH
-- In your binary's output location, create a `mediapipe` directory. Copy the `modules` and `models` folders from `bazel-bin/mediapipe` into this new directory. (Copy from `bazel-bin/mediapipe`, _NOT_ `mediapipe`, as the latter contains empty source directories.)
+1. The header file that goes with libexample can be found under `mediapipe/examples/desktop/libexample/example.h`
+2. The library files can be found under
+`bazel-bin/mediapipe/examples/desktop/libexample` as follows:
+    - On Linux:
+        1. Use the `libexample.so` shared library in your project
+    - On Windows:
+        1. Copy `libexample.dll` to your binary's output location (or otherwise ensure that it is in your PATH)
+        2. Use the `libexample.dll.if.lib` [import library](https://en.wikipedia.org/wiki/Dynamic-link_library#Import_libraries) in your project
+        3. Also copy `opencv_world###.dll` to your binary's output location (or otherwise ensure it is in your PATH)
+3. In your binary's output location, create a `mediapipe` directory. Copy the `modules` and `models` folders from **`bazel-bin/mediapipe`** into this new directory. (Be sure to copy from `bazel-bin/mediapipe`, _NOT_ `mediapipe`, as the latter contains empty source directories.)
 
 
 ## Notes
