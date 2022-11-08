@@ -2,7 +2,7 @@
 
 ## Integrate MediaPipe into Your C++ Application
 
-A new MediaPipe build target has been added under `mediapipe/examples/desktop/libmp`. Using Bazel, you can build this target to create a shared library (`.so` on Linux, `.dll` on Windows), which you can then integrate - along with its `.h` header file - into any C++ application you wish.
+A new MediaPipe build target has been added under [`/mediapipe/examples/desktop/libmp`](/mediapipe/examples/desktop/libmp). Using Bazel, you can build this target to create a shared library (`.so` on Linux, `.dll` on Windows), which you can then integrate - along with its [`.h` header file](/mediapipe/examples/desktop/libmp/libmp.h) - into any C++ application you wish.
 
 
 ## Prerequisites
@@ -35,27 +35,26 @@ A new MediaPipe build target has been added under `mediapipe/examples/desktop/li
 
 
 ## Usage
-1. The header file that goes with libmp can be found under `mediapipe/examples/desktop/libmp/libmp.h`
+1. The header file that goes with libmp can be found at [`/mediapipe/examples/desktop/libmp/libmp.h`](/mediapipe/examples/desktop/libmp/libmp.h)
 2. The library files can be found under
-`bazel-bin/mediapipe/examples/desktop/libmp` as follows:
+`/bazel-bin/mediapipe/examples/desktop/libmp` as follows:
     - On Linux:
         1. Use the `libmp.so` shared library in your project
     - On Windows:
         1. Copy `libmp.dll` to your binary's output location (or otherwise ensure that it is in your PATH)
         2. Use the `libmp.dll.if.lib` [import library](https://en.wikipedia.org/wiki/Dynamic-link_library#Import_libraries) in your project
         3. Also copy `opencv_world###.dll` to your binary's output location (or otherwise ensure it is in your PATH)
-3. In your binary's output location, create a `mediapipe` directory. Copy the `modules` and `models` folders from **`bazel-bin/mediapipe`** into this new directory. (Be sure to copy from `bazel-bin/mediapipe`, _NOT_ `mediapipe`, as the latter contains empty source directories.)
+3. In your binary's output location, create a `mediapipe` directory. Copy the `modules` and `models` folders from **`/bazel-bin/mediapipe`** into this new directory. (Be sure to copy from `/bazel-bin/mediapipe`, _NOT_ `/mediapipe`, as the latter contains empty source directories.)
 
 
 ## Notes
-- Unused OpenCV libraries are disabled in `third_party/opencv_linux.BUILD`. If you need them, you can re-enable them to get them linked in the final binary too.
-- One recent breaking change to MediaPipe is that models (e.g., .tflite files) are no longer included in the repository itself. They are instead hosted on [Google Cloud Storage (GCS)](https://storage.googleapis.com/mediapipe-assets/). If your code is not working for some reason, you can manually clone an older version of the google/mediapipe repository and copy the source `mediapipe/models` and `mediapipe/modules` folders over to your binary's location. See [cc6a2f7](https://github.com/google/mediapipe/tree/cc6a2f7af65977248b2a15f471503da2832f583a) for the last versions of these folders before deletion.
+- Unused OpenCV libraries are disabled in `/third_party/opencv_linux.BUILD`. If you need them, you can re-enable them to get them linked in the final binary too.
+- One recent breaking change to MediaPipe is that models (e.g., `.tflite` files) are no longer included in the repository itself. They are instead hosted on [Google Cloud Storage (GCS)](https://storage.googleapis.com/mediapipe-assets/). If your code is not working for some reason, you can manually clone an older version of [`google/mediapipe`](https://github.com/google/mediapipe) and copy the source `/mediapipe/models` and `/mediapipe/modules` folders over to your binary's location. See [cc6a2f7](https://github.com/google/mediapipe/tree/cc6a2f7af65977248b2a15f471503da2832f583a) for the last versions of these folders before deletion.
+---
 
----
-layout: default
-title: Home
-nav_order: 1
----
+|layout|title|nav_order|
+|-|-|-|
+|default|home|1|
 
 ![MediaPipe](https://mediapipe.dev/images/mediapipe_small.png)
 
