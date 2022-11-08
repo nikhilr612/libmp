@@ -1,8 +1,8 @@
-# MediaPipe Shared Library
+# LibMP: MediaPipe as a Shared Library
 
 ## Integrate MediaPipe into Your C++ Application
 
-A new "MediaPipe example" has been added under `mediapipe/examples/desktop/libexample`. Using Bazel, you can build this target. This will create a shared library (`.so` on Linux, `.dll` on Windows), which you can then integrate (along with its `.h` header file) into any C++ application you wish.
+A new MediaPipe build target has been added under `mediapipe/examples/desktop/libmp`. Using Bazel, you can build this target to create a shared library (`.so` on Linux, `.dll` on Windows), which you can then integrate - along with its `.h` header file - into any C++ application you wish.
 
 
 ## Prerequisites
@@ -26,21 +26,21 @@ A new "MediaPipe example" has been added under `mediapipe/examples/desktop/libex
 ## Building
 ### Linux
 1. `git clone` this repository and `cd` into it
-2. Run `bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/libexample:libexample.so`
+2. Run `bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/libmp:libmp.so`
 ### Windows
 1. `git clone` this repository and `cd` into it
-2. Run `build_libexample_win.sh` (Bash) or `build_libexample_win.bat` (CMD, Powershell)
+2. Run `build_libmp_win.sh` (Bash) or `build_libmp_win.bat` (CMD, Powershell)
 
 
 ## Usage
-1. The header file that goes with libexample can be found under `mediapipe/examples/desktop/libexample/example.h`
+1. The header file that goes with libmp can be found under `mediapipe/examples/desktop/libmp/libmp.h`
 2. The library files can be found under
-`bazel-bin/mediapipe/examples/desktop/libexample` as follows:
+`bazel-bin/mediapipe/examples/desktop/libmp` as follows:
     - On Linux:
-        1. Use the `libexample.so` shared library in your project
+        1. Use the `libmp.so` shared library in your project
     - On Windows:
-        1. Copy `libexample.dll` to your binary's output location (or otherwise ensure that it is in your PATH)
-        2. Use the `libexample.dll.if.lib` [import library](https://en.wikipedia.org/wiki/Dynamic-link_library#Import_libraries) in your project
+        1. Copy `libmp.dll` to your binary's output location (or otherwise ensure that it is in your PATH)
+        2. Use the `libmp.dll.if.lib` [import library](https://en.wikipedia.org/wiki/Dynamic-link_library#Import_libraries) in your project
         3. Also copy `opencv_world###.dll` to your binary's output location (or otherwise ensure it is in your PATH)
 3. In your binary's output location, create a `mediapipe` directory. Copy the `modules` and `models` folders from **`bazel-bin/mediapipe`** into this new directory. (Be sure to copy from `bazel-bin/mediapipe`, _NOT_ `mediapipe`, as the latter contains empty source directories.)
 
