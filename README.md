@@ -4,6 +4,8 @@
 
 A new MediaPipe build target has been added under [`/mediapipe/examples/desktop/libmp`](/mediapipe/examples/desktop/libmp). Using Bazel, you can build this target to create a shared library (`.so` on Linux, `.dll` on Windows), which you can then integrate - along with its [`.h` header file](/mediapipe/examples/desktop/libmp/libmp.h) - into any C++ application you wish.
 
+Compilation has been tested on Windows (MSVC 17.3.5) and Ubuntu 20.04 (GCC 9.4.0).
+
 
 ## Prerequisites
 ### Linux
