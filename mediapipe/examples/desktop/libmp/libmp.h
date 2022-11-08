@@ -1,6 +1,7 @@
 #ifndef LIBMP_H
 #define LIBMP_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 // Windows DLL
