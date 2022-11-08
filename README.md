@@ -50,6 +50,10 @@ A new MediaPipe build target has been added under [`/mediapipe/examples/desktop/
 ## Notes
 - Unused OpenCV libraries are disabled in `/third_party/opencv_linux.BUILD`. If you need them, you can re-enable them to get them linked in the final binary too.
 - One recent breaking change to MediaPipe is that models (e.g., `.tflite` files) are no longer included in the repository itself. They are instead hosted on [Google Cloud Storage (GCS)](https://storage.googleapis.com/mediapipe-assets/). If your code is not working for some reason, you can manually clone an older version of [`google/mediapipe`](https://github.com/google/mediapipe) and copy the source `/mediapipe/models` and `/mediapipe/modules` folders over to your binary's location. See [cc6a2f7](https://github.com/google/mediapipe/tree/cc6a2f7af65977248b2a15f471503da2832f583a) for the last versions of these folders before deletion.
+
+## Contributions
+Questions, suggestions, issues, pull requests, etc. are all welcome!
+
 ---
 
 |layout|title|nav_order|
