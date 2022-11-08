@@ -10,7 +10,9 @@ A new MediaPipe build target has been added under `mediapipe/examples/desktop/li
 1. Install OpenCV
     - Download pre-compiled binaries: `sudo apt-get install libopencv-core-dev libopencv-imgproc-dev libopencv-imgcodecs-dev`
     - Alternatively, build from source
-2. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager. To match build settings to your own OpenCV version and path, modify the `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION") and `/WORKSPACE` (search for "windows_opencv") Bazel files.
+2. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager (i.e., at `/usr`). To match build settings to your own OpenCV version and path, modify the following Bazel files:
+    - `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION")
+    - `/WORKSPACE` (search for "linux_opencv")
 ### Windows
 1. Install OpenCV
     - Download pre-compiled binaries
