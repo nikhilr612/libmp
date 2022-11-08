@@ -24,18 +24,18 @@ public:
     size_t GetOutputImageSize(const void* outputPacketVoid);
     bool WriteOutputImage(uint8_t* dst, const void* outputPacketVoid);
 
-    const void* GetOutputPacketProto(const void* outputPacketVoid);
-    const void* GetOutputPacketProto(const void* outputPacketVoid, unsigned int idx);
-    size_t GetOutputProtoVecSize(const void* outputPacketVoid);
-    size_t GetOutputProtoByteSize(const void* outputProtoVoid);
-    bool WriteOutputProtoData(uint8_t* dst, const void* outputProtoVoid, int size);
+    const void* GetPacketProtoMsg(const void* outputPacketVoid);
+    const void* GetPacketProtoMsgAt(const void* outputPacketVoid, unsigned int idx);
+    size_t GetProtoMsgVecSize(const void* outputPacketVoid);
+    size_t GetProtoMsgByteSize(const void* outputProtoVoid);
+    bool WriteProtoMsgData(uint8_t* dst, const void* outputProtoVoid, int size);
 
 private:
     mediapipe::CalculatorGraph m_graph;
+    std::string m_input_stream;
     std::unordered_map<std::string, absl::StatusOr<OutputStreamPoller>> m_pollers;
     std::unordered_map<std::string, mediapipe::Packet> m_packets;
     size_t m_frame_timestamp = 0;
-    std::string m_input_stream;
 };
 
 }

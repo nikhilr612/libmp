@@ -34,11 +34,11 @@ MP_CPP_EXPORT bool LibMP::WriteOutputImage(uint8_t* dst, const void* outputPacke
     return true;
 }
 
-MP_CPP_EXPORT const void* LibMP::GetOutputPacketProto(const void* outputPacketVoid){
+MP_CPP_EXPORT const void* LibMP::GetPacketProtoMsg(const void* outputPacketVoid){
     auto outputPacket = reinterpret_cast<const mediapipe::Packet*>(outputPacketVoid);
     return reinterpret_cast<const void*>(&(outputPacket->GetProtoMessageLite()));
 }
-MP_CPP_EXPORT const void* LibMP::GetOutputPacketProto(const void* outputPacketVoid, unsigned int idx){
+MP_CPP_EXPORT const void* LibMP::GetPacketProtoMsgAt(const void* outputPacketVoid, unsigned int idx){
     auto outputPacket = reinterpret_cast<const mediapipe::Packet*>(outputPacketVoid);
     absl::StatusOr<std::vector<const google::protobuf::MessageLite*>> statusOrVec = outputPacket->GetVectorOfProtoMessageLitePtrs();
     if (!statusOrVec.ok()){
@@ -46,7 +46,7 @@ MP_CPP_EXPORT const void* LibMP::GetOutputPacketProto(const void* outputPacketVo
     }
     return reinterpret_cast<const void*>(statusOrVec.value()[idx]);
 }
-MP_CPP_EXPORT size_t LibMP::GetOutputProtoVecSize(const void* outputPacketVoid){
+MP_CPP_EXPORT size_t LibMP::GetProtoMsgVecSize(const void* outputPacketVoid){
     auto outputPacket = reinterpret_cast<const mediapipe::Packet*>(outputPacketVoid);
     absl::StatusOr<std::vector<const google::protobuf::MessageLite*>> statusOrVec = outputPacket->GetVectorOfProtoMessageLitePtrs();
     if (!statusOrVec.ok()){
@@ -54,11 +54,11 @@ MP_CPP_EXPORT size_t LibMP::GetOutputProtoVecSize(const void* outputPacketVoid){
     }
     return statusOrVec.value().size();
 }
-MP_CPP_EXPORT size_t LibMP::GetOutputProtoByteSize(const void* outputProtoVoid){
+MP_CPP_EXPORT size_t LibMP::GetProtoMsgByteSize(const void* outputProtoVoid){
     auto outputProto = reinterpret_cast<const google::protobuf::MessageLite*>(outputProtoVoid);
     return outputProto->ByteSizeLong();
 }
-MP_CPP_EXPORT bool LibMP::WriteOutputProtoData(uint8_t* dst, const void* outputProtoVoid, int size){
+MP_CPP_EXPORT bool LibMP::WriteProtoMsgData(uint8_t* dst, const void* outputProtoVoid, int size){
     auto outputProto = reinterpret_cast<const google::protobuf::MessageLite*>(outputProtoVoid);
     return outputProto->SerializeToArray(dst, size);
 }
