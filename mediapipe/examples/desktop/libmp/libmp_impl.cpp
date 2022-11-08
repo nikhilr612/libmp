@@ -58,7 +58,7 @@ bool LibMPImpl::Process(uint8_t* data, int width, int height)
     m_packets.clear();
 
     int width_step = width * ImageFrame::ByteDepthForFormat(ImageFormat::SRGB) * ImageFrame::NumberOfChannelsForFormat(ImageFormat::SRGB);
-    auto input_frame_for_input = absl::make_unique<ImageFrame>(ImageFormat::SRGB, width, height, width_step, (uint8*)data, ImageFrame::PixelDataDeleter::kNone);
+    auto input_frame_for_input = absl::make_unique<ImageFrame>(ImageFormat::SRGB, width, height, width_step, data, ImageFrame::PixelDataDeleter::kNone);
 
     m_frame_timestamp++;
 
