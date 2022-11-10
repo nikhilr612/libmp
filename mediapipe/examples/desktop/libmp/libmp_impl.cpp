@@ -10,79 +10,91 @@
 
 namespace mediapipe {
 
-LibMPImpl::~LibMPImpl()
-{
-    LOG(INFO) << "Shutting down.";
-    absl::Status status = m_graph.CloseInputStream(m_input_stream);
-    if (status.ok()){
-    	absl::Status status1 = m_graph.WaitUntilDone();
-        if (!status1.ok()) {
-            LOG(INFO) << "Error in WaitUntilDone(): " << status1.ToString();
-        }
-    } else {
-        LOG(INFO) << "Error in CloseInputStream(): " << status.ToString();
-    }
-}
+	LibMPImpl::~LibMPImpl()
+	{
+		LOG(INFO) << "Shutting down.";
+		absl::Status status = m_graph.CloseInputStream(m_input_stream);
+		if (status.ok()){
+			absl::Status status1 = m_graph.WaitUntilDone();
+			if (!status1.ok()){
+				LOG(INFO) << "Error in WaitUntilDone(): " << status1.ToString();
+			}
+		} else {
+			LOG(INFO) << "Error in CloseInputStream(): " << status.ToString();
+		}
+	}
 
-absl::Status LibMPImpl::Init(const char* graph, const char* inputStream){
-    LOG(INFO) << "Parsing graph config";
-    mediapipe::CalculatorGraphConfig config = mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(graph);
+	absl::Status LibMPImpl::Init(const char* graph, const char* inputStream){
+		mediapipe::CalculatorGraphConfig config = mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(graph);
+		MP_RETURN_IF_ERROR(m_graph.Initialize(config));
+		m_input_stream.assign(inputStream);
+		LOG(INFO) << "Successfully initialized LibMP graph";
+		return absl::OkStatus();
+	}
 
-    LOG(INFO) << "Initializing the calculator graph.";
-    MP_RETURN_IF_ERROR(m_graph.Initialize(config));
+	bool LibMPImpl::AddOutputStream(const char* outputStream){
+		m_pollers.emplace(outputStream, m_graph.AddOutputStreamPoller(outputStream));
+		return m_pollers.at(outputStream).ok() ? true : false;
+	}
 
-    m_input_stream.assign(inputStream);
+	void LibMPImpl::SetOutputStreamMaxQueueSize(const char* outputStream, int queue_size){
+		m_pollers.at(outputStream)->SetMaxQueueSize(queue_size);
+	}
 
-    return absl::OkStatus();
-}
+	bool LibMPImpl::Start(){
+		const std::map<std::string, mediapipe::Packet>& extra_side_packets = {};
+		bool ok = m_graph.StartRun(extra_side_packets).ok();
+		LOG(INFO) << (ok ? "Started " : "Failed to start ") << "calculator graph";
+		return ok;
+	}
 
-bool LibMPImpl::AddOutputStream(const char* outputStream){
-    m_pollers.emplace(outputStream, m_graph.AddOutputStreamPoller(outputStream));
-    return m_pollers.at(outputStream).ok() ? true : false;
-}
+	bool LibMPImpl::Process(uint8_t* data, int width, int height, int image_format)
+	{
+		if (data == nullptr){
+			LOG(INFO) << __FUNCTION__ << " input data is nullptr!";
+			return false;
+		}
+		if (!mediapipe::ImageFormat::Format_IsValid(image_format)){
+			LOG(INFO) << __FUNCTION__ << " input image format (" << image_format << ") is invalid!";
+			return false;
+		}
 
-bool LibMPImpl::Start(){
-    LOG(INFO) << "Start running the calculator graph.";
-    const std::map<std::string, mediapipe::Packet>& extra_side_packets = {};
-    return m_graph.StartRun(extra_side_packets).ok();
-}
+		// copy input data to ImgFrame
+		auto input_frame_for_input = std::make_unique<ImageFrame>();
+		auto mp_image_format = static_cast<mediapipe::ImageFormat::Format>(image_format);
+		input_frame_for_input->CopyPixelData(mp_image_format, width, height, data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 
-bool LibMPImpl::Process(uint8_t* data, int width, int height) 
-{
-    if (data == nullptr){
-        LOG(INFO) << __FUNCTION__ << " input data is nullptr!";
-        return false;
-    }
+		m_frame_timestamp++;
 
-    // Clear packets
-    m_packets.clear();
+		// the created ImageFrame is now owned by the input packet
+		auto status = m_graph.AddPacketToInputStream(m_input_stream, mediapipe::Adopt(input_frame_for_input.release()).At(mediapipe::Timestamp(m_frame_timestamp)));
 
-    int width_step = width * ImageFrame::ByteDepthForFormat(ImageFormat::SRGB) * ImageFrame::NumberOfChannelsForFormat(ImageFormat::SRGB);
-    auto input_frame_for_input = absl::make_unique<ImageFrame>(ImageFormat::SRGB, width, height, width_step, data, ImageFrame::PixelDataDeleter::kNone);
+		if (!status.ok()){
+			LOG(INFO) << "Failed to add packet to input stream. Call m_graph.WaitUntilDone() to see error (or destroy LibMP object)";
+			return false;
+		}
+		return true;
+	}
 
-    m_frame_timestamp++;
+	bool LibMPImpl::WaitUntilIdle(){
+		return m_graph.WaitUntilIdle().ok();
+	}
 
-    if (!m_graph.AddPacketToInputStream(m_input_stream, mediapipe::Adopt(input_frame_for_input.release()).At(mediapipe::Timestamp(m_frame_timestamp))).ok()) {
-        LOG(INFO) << "Failed to add packet to input stream. Call m_graph.WaitUntilDone() to see error (or destroy LibMP object)";
-        return false;
-    }
+	int LibMPImpl::GetOutputQueueSize(const char* outputStream){
+		return m_pollers.at(outputStream)->QueueSize();
+	}
 
-    return true;
-}
-
-const void* LibMPImpl::GetOutputPacket(const char* outputStream){
-    if (m_pollers.find(outputStream) == m_pollers.end()){
-        LOG(INFO) << "No poller found for output stream '" << outputStream << "'. Was it created using AddOutputStream beforehand?";
-        return nullptr;
-    }
-    if (m_packets.find(outputStream) == m_packets.end()){
-        m_packets.emplace(outputStream, mediapipe::Packet());
-        if (!m_pollers.at(outputStream)->Next(&m_packets.at(outputStream))){
-            LOG(INFO) << "Poller for output stream '" << outputStream << "' has no next packet. Call m_graph.WaitUntilDone() to see error (or destroy LibMP object). Are models available under mediapipe/models and mediapipe/modules?";
-            return nullptr;
-        }
-    }
-    return reinterpret_cast<const void*>(&m_packets.at(outputStream));
-}
+	const void* LibMPImpl::GetOutputPacket(const char* outputStream){
+		if (m_pollers.find(outputStream) == m_pollers.end()){
+			LOG(INFO) << "No poller found for output stream '" << outputStream << "'. Was it created using AddOutputStream beforehand?";
+			return nullptr;
+		}
+		auto outputPacket = std::make_unique<mediapipe::Packet>();
+		if (!m_pollers.at(outputStream)->Next(outputPacket.get())){
+			LOG(INFO) << "Poller for output stream '" << outputStream << "' has no next packet. Call m_graph.WaitUntilDone() to see error (or destroy LibMP object). Are models available under mediapipe/models and mediapipe/modules?";
+			return nullptr;
+		}
+		return reinterpret_cast<const void*>(outputPacket.release());
+	}
 
 }
