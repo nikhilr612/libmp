@@ -34,6 +34,7 @@ Compilation has been tested on Windows (MSVC 17.3.5) and Ubuntu 20.04 (GCC 9.4.0
 ### Windows
 1. `git clone` this repository and `cd` into it
 2. Run `build_libmp_win.sh` (Bash) or `build_libmp_win.bat` (CMD, Powershell)
+    - Edit the Bazel-related environmental variables defined by the script(s) as necessary
 
 
 ## Usage
