@@ -87,7 +87,7 @@ namespace mediapipe {
 		static bool WriteProtoMsgData(uint8_t* dst, const void* outputProtoVoid, int size);
 
 		// Deletes packet
-		static void LibMP::DeletePacket(const void* packetVoid);
+		static void DeletePacket(const void* packetVoid);
 	};
 
 }
