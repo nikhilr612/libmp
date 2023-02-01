@@ -71,6 +71,7 @@ namespace mediapipe {
 
 		if (!status.ok()){
 			LOG(INFO) << "Failed to add packet to input stream. Call m_graph.WaitUntilDone() to see error (or destroy LibMP object)";
+			LOG(INFO) << "Status: " << status.ToString() << std::endl;
 			return false;
 		}
 		return true;
