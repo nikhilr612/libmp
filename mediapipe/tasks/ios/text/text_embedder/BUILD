@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-package(default_visibility = ["//mediapipe/tasks:internal"])
+package(default_visibility = [
+    "//mediapipe/tasks:internal",
+])
 
 licenses(["notice"])
 
@@ -49,6 +51,7 @@ objc_library(
         "//mediapipe/tasks/cc/text/text_embedder:text_embedder_graph",
         "//mediapipe/tasks/ios/common/utils:MPPCommonUtils",
         "//mediapipe/tasks/ios/common/utils:NSStringHelpers",
+        "//mediapipe/tasks/ios/components/utils:MPPCosineSimilarity",
         "//mediapipe/tasks/ios/core:MPPTaskInfo",
         "//mediapipe/tasks/ios/core:MPPTaskOptions",
         "//mediapipe/tasks/ios/core:MPPTextPacketCreator",
