@@ -6,6 +6,7 @@ A new MediaPipe build target has been added under [`/mediapipe/examples/desktop/
 
 Compilation has been tested on Windows (MSVC 17.3.5) and Ubuntu 20.04 (GCC 9.4.0).
 
+Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexample`](https://github.com/asprecic/mediapipe/blob/linux-lib-example/mediapipe/examples/desktop/libexample), which made LibMP possible!
 
 ## Prerequisites
 ### Linux
