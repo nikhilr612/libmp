@@ -13,7 +13,8 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
 1. Install OpenCV
     - Download pre-compiled binaries: `sudo apt-get install libopencv-core-dev libopencv-imgproc-dev libopencv-imgcodecs-dev`
     - Alternatively, build from source
-2. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager (i.e., at `/usr`). To match build settings to your own OpenCV version and path, modify the following Bazel files:
+2. Install Bazel
+3. By default, this repository's Bazel build files expect OpenCV to be version 4 and installed using the `apt` package manager (i.e., at `/usr`). To match build settings to your own OpenCV version and path, modify the following Bazel files:
     - `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION")
     - `/WORKSPACE` (search for "linux_opencv")
 ### Windows
@@ -23,7 +24,8 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
         - Click on folder of desired OpenCV version (e.g., 4.6.0)
         - Download and run the installer `.exe` (e.g., `opencv-4.6.0-vc14_vc15.exe`)
     - Alternatively, build from source
-2. By default, this repository's Bazel build files expect OpenCV to be version `4.6.0` and installed at `C:\opencv`. To match build settings to your own OpenCV version and path, modify the following Bazel files:
+2. Install Bazel
+3. By default, this repository's Bazel build files expect OpenCV to be version `4.6.0` and installed at `C:\opencv`. To match build settings to your own OpenCV version and path, modify the following Bazel files:
     - `/third_party/opencv_windows.BUILD` (search for "OPENCV_VERSION")
     - `/WORKSPACE` (search for "windows_opencv")
 
@@ -36,6 +38,8 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
 1. `git clone` this repository and `cd` into it
 2. Run `build_libmp_win.sh` (Bash) or `build_libmp_win.bat` (CMD, Powershell)
     - Edit the Bazel-related environmental variables defined by the script(s) as necessary
+    - Bazel requires a Python executable with access to NumPy
+      - E.g., create a new conda environment, run `conda install numpy`, then point Bazel to the environment's Python executable
 
 
 ## Usage
