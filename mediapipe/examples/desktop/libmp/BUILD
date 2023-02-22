@@ -89,6 +89,14 @@ LIB_DEPS = [
     # Face mesh
     "//mediapipe/graphs/face_mesh:desktop_live_calculators",
 
+    # Face geometry (thanks, @oUp2Uo!)
+    # - Fixes from https://github.com/google/mediapipe/issues/2867 have been applied,
+    #   allowing for use of face mesh with attention (discards the 10 iris landmarks)
+    # - See https://github.com/google/mediapipe/issues/1162#issuecomment-1434268379 for details
+    "//mediapipe/modules/face_geometry:face_geometry_from_detection",
+    "//mediapipe/modules/face_geometry:env_generator_calculator",
+    "//mediapipe/modules/face_geometry:geometry_pipeline_calculator",
+
     # Hair segmentation
     "//mediapipe/graphs/hair_segmentation:desktop_calculators",
 
