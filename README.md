@@ -10,6 +10,7 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
 
 ## Prerequisites
 ### Linux
+- Bazel
 - OpenCV
     - Download pre-compiled binaries: `sudo apt-get install libopencv-core-dev libopencv-imgproc-dev libopencv-imgcodecs-dev`
     - Alternatively, build from source
@@ -17,6 +18,7 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
     - `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION")
     - `/WORKSPACE` (search for "linux_opencv")
 ### Windows
+- Bazel
 - OpenCV
     - Download pre-compiled binaries
         - Visit https://sourceforge.net/projects/opencvlibrary/files
@@ -41,6 +43,8 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
 1. `git clone` this repository and `cd` into it
 2. Run `build_libmp_win.sh` (Bash) or `build_libmp_win.bat` (CMD, Powershell)
     - Edit the Bazel-related environmental variables defined by the script(s) as necessary
+    - Bazel requires a Python executable with access to NumPy
+      - E.g., create a new conda environment, run `conda install numpy`, then point Bazel to the environment's Python executable
 
 
 ## Usage
