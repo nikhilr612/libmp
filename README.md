@@ -18,6 +18,7 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
     - `/third_party/opencv_linux.BUILD` (search for "OPENCV_VERSION")
     - `/WORKSPACE` (search for "linux_opencv")
 ### Windows
+- **NOTE:** If using Visual Studio, please use VS 2022 17.3.7 or below. There is a current bug in VS 2022 v17.4 and above that causes MediaPipe to fail to link/compile. See rajkundu/mediapipe#1 for more details.
 - Bazel
 - OpenCV
     - Download pre-compiled binaries
@@ -28,11 +29,6 @@ Enormous thanks to [@asprecic](https://github.com/asprecic) for sharing [`libexa
 - By default, this repository's Bazel build files expect OpenCV to be version `4.6.0` and installed at `C:\opencv`. To match build settings to your own OpenCV version and path, modify the following Bazel files:
     - `/third_party/opencv_windows.BUILD` (search for "OPENCV_VERSION")
     - `/WORKSPACE` (search for "windows_opencv")
-- NOTE: If using Visual Studio, please use VS 2022 17.3.7 or below. There is a current bug in VS 2022 v17.4 and above that causes MediaPipe to fail to link/compile. See the following for more details:
-    - [google/mediapipe#3851](https://github.com/google/mediapipe/issues/3851)
-    - [google/mediapipe#4060](https://github.com/google/mediapipe/issues/4060)
-    - [rajkundu/libmp-example#3](https://github.com/rajkundu/libmp-example/issues/3)
-    - [VS Developer Community Issue](https://developercommunity.visualstudio.com/t/Static-Data-Member-Templates:-DLL-Linkin/10288174)
 
 
 ## Building
