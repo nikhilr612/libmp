@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,8 +38,14 @@ android_library(
 android_library(
     name = "detection",
     srcs = ["Detection.java"],
+    javacopts = [
+        "-Xep:AndroidJdkLibsChecker:OFF",
+    ],
     deps = [
         ":category",
+        ":normalizedkeypoint",
+        "//mediapipe/framework/formats:detection_java_proto_lite",
+        "//mediapipe/framework/formats:location_data_java_proto_lite",
         "//third_party:autovalue",
         "@maven//:com_google_guava_guava",
     ],
@@ -86,6 +92,18 @@ android_library(
 android_library(
     name = "normalized_landmark",
     srcs = ["NormalizedLandmark.java"],
+    deps = [
+        "//third_party:autovalue",
+        "@maven//:com_google_guava_guava",
+    ],
+)
+
+android_library(
+    name = "normalizedkeypoint",
+    srcs = ["NormalizedKeypoint.java"],
+    javacopts = [
+        "-Xep:AndroidJdkLibsChecker:OFF",
+    ],
     deps = [
         "//third_party:autovalue",
         "@maven//:com_google_guava_guava",

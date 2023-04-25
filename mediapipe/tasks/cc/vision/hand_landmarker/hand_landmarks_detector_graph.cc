@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -59,7 +59,6 @@ using ::mediapipe::api2::Output;
 using ::mediapipe::api2::builder::Graph;
 using ::mediapipe::api2::builder::Source;
 using ::mediapipe::tasks::components::utils::AllowIf;
-using ::mediapipe::tasks::core::ModelResources;
 using ::mediapipe::tasks::vision::hand_landmarker::proto::
     HandLandmarksDetectorGraphOptions;
 using LabelItems = mediapipe::proto_ns::Map<int64, ::mediapipe::LabelMapItem>;
@@ -409,7 +408,7 @@ REGISTER_MEDIAPIPE_GRAPH(
 // - Accepts CPU input image and a vector of hand rect RoIs to detect the
 //   multiple hands landmarks enclosed by the RoIs. Output vectors of
 //   hand landmarks related results, where each element in the vectors
-//   corrresponds to the result of the same hand.
+//   corresponds to the result of the same hand.
 //
 // Inputs:
 //   IMAGE - Image

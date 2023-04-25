@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -157,9 +157,9 @@ absl::StatusOr<ObjectDetectorResult> ObjectDetector::Detect(
         absl::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
-  ASSIGN_OR_RETURN(
-      NormalizedRect norm_rect,
-      ConvertToNormalizedRect(image_processing_options, /*roi_allowed=*/false));
+  ASSIGN_OR_RETURN(NormalizedRect norm_rect,
+                   ConvertToNormalizedRect(image_processing_options, image,
+                                           /*roi_allowed=*/false));
   ASSIGN_OR_RETURN(
       auto output_packets,
       ProcessImageData(
@@ -170,7 +170,7 @@ absl::StatusOr<ObjectDetectorResult> ObjectDetector::Detect(
 }
 
 absl::StatusOr<ObjectDetectorResult> ObjectDetector::DetectForVideo(
-    mediapipe::Image image, int64 timestamp_ms,
+    mediapipe::Image image, int64_t timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
@@ -178,9 +178,9 @@ absl::StatusOr<ObjectDetectorResult> ObjectDetector::DetectForVideo(
         absl::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
-  ASSIGN_OR_RETURN(
-      NormalizedRect norm_rect,
-      ConvertToNormalizedRect(image_processing_options, /*roi_allowed=*/false));
+  ASSIGN_OR_RETURN(NormalizedRect norm_rect,
+                   ConvertToNormalizedRect(image_processing_options, image,
+                                           /*roi_allowed=*/false));
   ASSIGN_OR_RETURN(
       auto output_packets,
       ProcessVideoData(
@@ -195,7 +195,7 @@ absl::StatusOr<ObjectDetectorResult> ObjectDetector::DetectForVideo(
 }
 
 absl::Status ObjectDetector::DetectAsync(
-    Image image, int64 timestamp_ms,
+    Image image, int64_t timestamp_ms,
     std::optional<core::ImageProcessingOptions> image_processing_options) {
   if (image.UsesGpu()) {
     return CreateStatusWithPayload(
@@ -203,9 +203,9 @@ absl::Status ObjectDetector::DetectAsync(
         absl::StrCat("GPU input images are currently not supported."),
         MediaPipeTasksStatus::kRunnerUnexpectedInputError);
   }
-  ASSIGN_OR_RETURN(
-      NormalizedRect norm_rect,
-      ConvertToNormalizedRect(image_processing_options, /*roi_allowed=*/false));
+  ASSIGN_OR_RETURN(NormalizedRect norm_rect,
+                   ConvertToNormalizedRect(image_processing_options, image,
+                                           /*roi_allowed=*/false));
   return SendLiveStreamData(
       {{kImageInStreamName,
         MakePacket<Image>(std::move(image))

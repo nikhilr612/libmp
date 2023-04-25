@@ -1,4 +1,4 @@
-# Copyright 2023 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2023 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ mediapipe_proto_library(
     name = "face_landmarks_detector_graph_options_proto",
     srcs = ["face_landmarks_detector_graph_options.proto"],
     deps = [
+        ":face_blendshapes_graph_options_proto",
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
         "//mediapipe/tasks/cc/core/proto:base_options_proto",
@@ -47,5 +48,18 @@ mediapipe_proto_library(
         "//mediapipe/calculators/tensor:tensors_to_landmarks_calculator_proto",
         "//mediapipe/framework:calculator_options_proto",
         "//mediapipe/framework:calculator_proto",
+    ],
+)
+
+mediapipe_proto_library(
+    name = "face_landmarker_graph_options_proto",
+    srcs = ["face_landmarker_graph_options.proto"],
+    deps = [
+        ":face_landmarks_detector_graph_options_proto",
+        "//mediapipe/framework:calculator_options_proto",
+        "//mediapipe/framework:calculator_proto",
+        "//mediapipe/tasks/cc/core/proto:base_options_proto",
+        "//mediapipe/tasks/cc/vision/face_detector/proto:face_detector_graph_options_proto",
+        "//mediapipe/tasks/cc/vision/face_geometry/proto:face_geometry_graph_options_proto",
     ],
 )

@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ struct BaseOptions {
   enum Delegate {
     CPU = 0,
     GPU = 1,
+    // Edge TPU acceleration using NNAPI delegate.
+    EDGETPU_NNAPI = 2,
   };
 
   Delegate delegate = CPU;

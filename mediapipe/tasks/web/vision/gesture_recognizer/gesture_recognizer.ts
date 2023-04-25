@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+ * Copyright 2022 The MediaPipe Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import {convertClassifierOptionsToProto} from '../../../../tasks/web/components/
 import {WasmFileset} from '../../../../tasks/web/core/wasm_fileset';
 import {ImageProcessingOptions} from '../../../../tasks/web/vision/core/image_processing_options';
 import {VisionGraphRunner, VisionTaskRunner} from '../../../../tasks/web/vision/core/vision_task_runner';
+import {HAND_CONNECTIONS} from '../../../../tasks/web/vision/hand_landmarker/hand_landmarks_connections';
 import {ImageSource, WasmModule} from '../../../../web/graph_runner/graph_runner';
 // Placeholder for internal dependency on trusted resource url
 
@@ -73,6 +74,12 @@ export class GestureRecognizer extends VisionTaskRunner {
       HandGestureRecognizerGraphOptions;
 
   /**
+   * An array containing the pairs of hand landmark indices to be rendered with
+   * connections.
+   */
+  static HAND_CONNECTIONS = HAND_CONNECTIONS;
+
+  /**
    * Initializes the Wasm runtime and creates a new gesture recognizer from the
    * provided options.
    * @param wasmFileset A configuration object that provides the location of the
@@ -85,9 +92,8 @@ export class GestureRecognizer extends VisionTaskRunner {
       wasmFileset: WasmFileset,
       gestureRecognizerOptions: GestureRecognizerOptions):
       Promise<GestureRecognizer> {
-    return VisionTaskRunner.createInstance(
-        GestureRecognizer, /* initializeCanvas= */ true, wasmFileset,
-        gestureRecognizerOptions);
+    return VisionTaskRunner.createVisionInstance(
+        GestureRecognizer, wasmFileset, gestureRecognizerOptions);
   }
 
   /**
@@ -100,9 +106,8 @@ export class GestureRecognizer extends VisionTaskRunner {
   static createFromModelBuffer(
       wasmFileset: WasmFileset,
       modelAssetBuffer: Uint8Array): Promise<GestureRecognizer> {
-    return VisionTaskRunner.createInstance(
-        GestureRecognizer, /* initializeCanvas= */ true, wasmFileset,
-        {baseOptions: {modelAssetBuffer}});
+    return VisionTaskRunner.createVisionInstance(
+        GestureRecognizer, wasmFileset, {baseOptions: {modelAssetBuffer}});
   }
 
   /**
@@ -115,9 +120,8 @@ export class GestureRecognizer extends VisionTaskRunner {
   static createFromModelPath(
       wasmFileset: WasmFileset,
       modelAssetPath: string): Promise<GestureRecognizer> {
-    return VisionTaskRunner.createInstance(
-        GestureRecognizer, /* initializeCanvas= */ true, wasmFileset,
-        {baseOptions: {modelAssetPath}});
+    return VisionTaskRunner.createVisionInstance(
+        GestureRecognizer, wasmFileset, {baseOptions: {modelAssetPath}});
   }
 
   /** @hideconstructor */
@@ -143,6 +147,11 @@ export class GestureRecognizer extends VisionTaskRunner {
         new HandGestureRecognizerGraphOptions();
     this.options.setHandGestureRecognizerGraphOptions(
         this.handGestureRecognizerGraphOptions);
+    this.handDetectorGraphOptions.setMinDetectionConfidence(DEFAULT_CONFIDENCE);
+    this.handLandmarkerGraphOptions.setMinTrackingConfidence(
+        DEFAULT_CONFIDENCE);
+    this.handLandmarksDetectorGraphOptions.setMinDetectionConfidence(
+        DEFAULT_CONFIDENCE);
   }
 
   protected override get baseOptions(): BaseOptionsProto {
@@ -165,12 +174,20 @@ export class GestureRecognizer extends VisionTaskRunner {
   override setOptions(options: GestureRecognizerOptions): Promise<void> {
     this.handDetectorGraphOptions.setNumHands(
         options.numHands ?? DEFAULT_NUM_HANDS);
-    this.handDetectorGraphOptions.setMinDetectionConfidence(
-        options.minHandDetectionConfidence ?? DEFAULT_CONFIDENCE);
-    this.handLandmarkerGraphOptions.setMinTrackingConfidence(
-        options.minTrackingConfidence ?? DEFAULT_CONFIDENCE);
-    this.handLandmarksDetectorGraphOptions.setMinDetectionConfidence(
-        options.minHandPresenceConfidence ?? DEFAULT_CONFIDENCE);
+    if ('minHandDetectionConfidence' in options) {
+      this.handDetectorGraphOptions.setMinDetectionConfidence(
+          options.minHandDetectionConfidence ?? DEFAULT_CONFIDENCE);
+    }
+
+    if ('minTrackingConfidence' in options) {
+      this.handLandmarkerGraphOptions.setMinTrackingConfidence(
+          options.minTrackingConfidence ?? DEFAULT_CONFIDENCE);
+    }
+
+    if ('minHandPresenceConfidence' in options) {
+      this.handLandmarksDetectorGraphOptions.setMinDetectionConfidence(
+          options.minHandPresenceConfidence ?? DEFAULT_CONFIDENCE);
+    }
 
     if (options.cannedGesturesClassifierOptions) {
       // Note that we have to support both JSPB and ProtobufJS and cannot

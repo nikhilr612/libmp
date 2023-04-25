@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,9 +115,11 @@ def get_steps_per_epoch(steps_per_epoch: Optional[int] = None,
 def convert_to_tflite(
     model: tf.keras.Model,
     quantization_config: Optional[quantization.QuantizationConfig] = None,
-    supported_ops: Tuple[tf.lite.OpsSet,
-                         ...] = (tf.lite.OpsSet.TFLITE_BUILTINS,),
-    preprocess: Optional[Callable[..., bool]] = None) -> bytearray:
+    supported_ops: Tuple[tf.lite.OpsSet, ...] = (
+        tf.lite.OpsSet.TFLITE_BUILTINS,
+    ),
+    preprocess: Optional[Callable[..., Any]] = None,
+) -> bytearray:
   """Converts the input Keras model to TFLite format.
 
   Args:

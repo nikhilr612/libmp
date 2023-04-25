@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -130,7 +130,7 @@ struct ObjectDetectorOptions {
 //
 // [1]:
 // https://github.com/google/mediapipe/blob/6cdc6443b6a7ed662744e2a2ce2d58d9c83e6d6f/mediapipe/tasks/metadata/metadata_schema.fbs#L456
-class ObjectDetector : tasks::vision::core::BaseVisionTaskApi {
+class ObjectDetector : public tasks::vision::core::BaseVisionTaskApi {
  public:
   using BaseVisionTaskApi::BaseVisionTaskApi;
 

@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ limitations under the License.
 #include "mediapipe/tasks/cc/components/containers/category.h"
 #include "mediapipe/tasks/cc/components/containers/classification_result.h"
 #include "mediapipe/tasks/cc/text/text_classifier/text_classifier_test_utils.h"
-#include "tensorflow/lite/core/shims/cc/shims_test_util.h"
+#include "tensorflow/lite/test_util.h"
 
 namespace mediapipe::tasks::text::text_classifier {
 namespace {
@@ -49,6 +49,7 @@ using ::testing::HasSubstr;
 using ::testing::Optional;
 
 constexpr int kMaxSeqLen = 128;
+const float kPrecision = 1e-6;
 constexpr char kTestDataDirectory[] = "/mediapipe/tasks/testdata/text/";
 constexpr char kTestBertModelPath[] = "bert_text_classifier.tflite";
 constexpr char kInvalidModelPath[] = "i/do/not/exist.tflite";
@@ -66,7 +67,6 @@ std::string GetFullPath(absl::string_view file_name) {
 // TODO: create shared matcher for ClassificationResult.
 void ExpectApproximatelyEqual(const TextClassifierResult& actual,
                               const TextClassifierResult& expected) {
-  const float kPrecision = 1e-6;
   ASSERT_EQ(actual.classifications.size(), expected.classifications.size());
   for (int i = 0; i < actual.classifications.size(); ++i) {
     const Classifications& a = actual.classifications[i];
@@ -87,7 +87,7 @@ void ExpectApproximatelyEqual(const TextClassifierResult& actual,
 
 }  // namespace
 
-class TextClassifierTest : public tflite_shims::testing::Test {};
+class TextClassifierTest : public tflite::testing::Test {};
 
 TEST_F(TextClassifierTest, CreateSucceedsWithBertModel) {
   auto options = std::make_unique<TextClassifierOptions>();
@@ -155,7 +155,7 @@ TEST_F(TextClassifierTest, TextClassifierWithBert) {
 #else
   negative_expected.classifications.emplace_back(Classifications{
       /*categories=*/{
-          {/*index=*/0, /*score=*/0.956317, /*category_name=*/"negative"},
+          {/*index=*/0, /*score=*/0.956316, /*category_name=*/"negative"},
           {/*index=*/1, /*score=*/0.043683, /*category_name=*/"positive"}},
       /*head_index=*/0,
       /*head_name=*/"probability"});

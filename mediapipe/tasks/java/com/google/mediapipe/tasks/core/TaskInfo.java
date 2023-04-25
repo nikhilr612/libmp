@@ -1,4 +1,4 @@
-// Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+// Copyright 2022 The MediaPipe Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link TaskInfo} contains all needed informaton to initialize a MediaPipe Task {@link
+ * {@link TaskInfo} contains all needed information to initialize a MediaPipe Task {@link
  * com.google.mediapipe.framework.Graph}.
  */
 @AutoValue

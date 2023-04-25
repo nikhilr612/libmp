@@ -1,4 +1,4 @@
-/* Copyright 2023 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2023 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,5 +41,5 @@ message FaceDetectorGraphOptions {
   optional float min_suppression_threshold = 3 [default = 0.5];
 
   // Maximum number of faces to detect in the image.
-  optional int32 num_faces = 4 [default = 1];
+  optional int32 num_faces = 4;
 }

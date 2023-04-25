@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ absl::Status ConfigureImageToTensorCalculator(
     options->mutable_output_tensor_float_range()->set_max((255.0f - mean) /
                                                           std);
   }
-  // TODO: need to support different GPU origin on differnt
+  // TODO: need to support different GPU origin on different
   // platforms or applications.
   options->set_gpu_origin(mediapipe::GpuOrigin::TOP_LEFT);
   return absl::OkStatus();
@@ -117,7 +117,9 @@ absl::Status ConfigureImageToTensorCalculator(
 
 bool DetermineImagePreprocessingGpuBackend(
     const core::proto::Acceleration& acceleration) {
-  return acceleration.has_gpu();
+  return acceleration.has_gpu() ||
+         (acceleration.has_nnapi() &&
+          acceleration.nnapi().accelerator_name() == "google-edgetpu");
 }
 
 absl::Status ConfigureImagePreprocessingGraph(

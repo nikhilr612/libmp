@@ -1,4 +1,4 @@
-/* Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+/* Copyright 2022 The MediaPipe Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ using ::tflite::EnumNameContentProperties;
 using ::tflite::ProcessUnit;
 using ::tflite::ProcessUnitOptions_ScoreThresholdingOptions;
 using ::tflite::TensorMetadata;
-using LabelItems = mediapipe::proto_ns::Map<int64, ::mediapipe::LabelMapItem>;
+using LabelItems = mediapipe::proto_ns::Map<int64_t, ::mediapipe::LabelMapItem>;
 using ObjectDetectorOptionsProto =
     object_detector::proto::ObjectDetectorOptions;
 using TensorsSource =

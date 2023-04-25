@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+ * Copyright 2022 The MediaPipe Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,50 +17,53 @@
 import {CalculatorGraphConfig} from '../../../../framework/calculator_pb';
 import {CalculatorOptions} from '../../../../framework/calculator_options_pb';
 import {BaseOptions as BaseOptionsProto} from '../../../../tasks/cc/core/proto/base_options_pb';
+import {TensorsToSegmentationCalculatorOptions} from '../../../../tasks/cc/vision/image_segmenter/calculators/tensors_to_segmentation_calculator_pb';
 import {ImageSegmenterGraphOptions as ImageSegmenterGraphOptionsProto} from '../../../../tasks/cc/vision/image_segmenter/proto/image_segmenter_graph_options_pb';
 import {SegmenterOptions as SegmenterOptionsProto} from '../../../../tasks/cc/vision/image_segmenter/proto/segmenter_options_pb';
 import {WasmFileset} from '../../../../tasks/web/core/wasm_fileset';
 import {ImageProcessingOptions} from '../../../../tasks/web/vision/core/image_processing_options';
+import {SegmentationMask} from '../../../../tasks/web/vision/core/types';
 import {VisionGraphRunner, VisionTaskRunner} from '../../../../tasks/web/vision/core/vision_task_runner';
+import {LabelMapItem} from '../../../../util/label_map_pb';
 import {ImageSource, WasmModule} from '../../../../web/graph_runner/graph_runner';
 // Placeholder for internal dependency on trusted resource url
 
 import {ImageSegmenterOptions} from './image_segmenter_options';
+import {ImageSegmenterResult} from './image_segmenter_result';
 
 export * from './image_segmenter_options';
+export * from './image_segmenter_result';
+export {SegmentationMask};
 export {ImageSource};  // Used in the public API
-
-/**
- * The ImageSegmenter returns the segmentation result as a Uint8Array (when
- * the default mode of `CATEGORY_MASK` is used) or as a Float32Array (for
- * output type `CONFIDENCE_MASK`). The `WebGLTexture` output type is reserved
- * for future usage.
- */
-export type SegmentationMask = Uint8Array|Float32Array|WebGLTexture;
-
-/**
- * A callback that receives the computed masks from the image segmenter. The
- * callback either receives a single element array with a category mask (as a
- * `[Uint8Array]`) or multiple confidence masks (as a `Float32Array[]`).
- * The returned data is only valid for the duration of the callback. If
- * asynchronous processing is needed, all data needs to be copied before the
- * callback returns.
- */
-export type SegmentationMaskCallback =
-    (masks: SegmentationMask[], width: number, height: number) => void;
 
 const IMAGE_STREAM = 'image_in';
 const NORM_RECT_STREAM = 'norm_rect';
-const GROUPED_SEGMENTATIONS_STREAM = 'segmented_masks';
-const IMAGEA_SEGMENTER_GRAPH =
+const CONFIDENCE_MASKS_STREAM = 'confidence_masks';
+const CATEGORY_MASK_STREAM = 'category_mask';
+const IMAGE_SEGMENTER_GRAPH =
     'mediapipe.tasks.vision.image_segmenter.ImageSegmenterGraph';
+const TENSORS_TO_SEGMENTATION_CALCULATOR_NAME =
+    'mediapipe.tasks.TensorsToSegmentationCalculator';
+const DEFAULT_OUTPUT_CATEGORY_MASK = false;
+const DEFAULT_OUTPUT_CONFIDENCE_MASKS = true;
 
 // The OSS JS API does not support the builder pattern.
 // tslint:disable:jspb-use-builder-pattern
 
+/**
+ * A callback that receives the computed masks from the image segmenter. The
+ * returned data is only valid for the duration of the callback. If
+ * asynchronous processing is needed, all data needs to be copied before the
+ * callback returns.
+ */
+export type ImageSegmenterCallback = (result: ImageSegmenterResult) => void;
+
 /** Performs image segmentation on images. */
 export class ImageSegmenter extends VisionTaskRunner {
-  private userCallback: SegmentationMaskCallback = () => {};
+  private result: ImageSegmenterResult = {width: 0, height: 0};
+  private labels: string[] = [];
+  private outputCategoryMask = DEFAULT_OUTPUT_CATEGORY_MASK;
+  private outputConfidenceMasks = DEFAULT_OUTPUT_CONFIDENCE_MASKS;
   private readonly options: ImageSegmenterGraphOptionsProto;
   private readonly segmenterOptions: SegmenterOptionsProto;
 
@@ -76,9 +79,8 @@ export class ImageSegmenter extends VisionTaskRunner {
   static createFromOptions(
       wasmFileset: WasmFileset,
       imageSegmenterOptions: ImageSegmenterOptions): Promise<ImageSegmenter> {
-    return VisionTaskRunner.createInstance(
-        ImageSegmenter, /* initializeCanvas= */ true, wasmFileset,
-        imageSegmenterOptions);
+    return VisionTaskRunner.createVisionInstance(
+        ImageSegmenter, wasmFileset, imageSegmenterOptions);
   }
 
   /**
@@ -91,9 +93,8 @@ export class ImageSegmenter extends VisionTaskRunner {
   static createFromModelBuffer(
       wasmFileset: WasmFileset,
       modelAssetBuffer: Uint8Array): Promise<ImageSegmenter> {
-    return VisionTaskRunner.createInstance(
-        ImageSegmenter, /* initializeCanvas= */ true, wasmFileset,
-        {baseOptions: {modelAssetBuffer}});
+    return VisionTaskRunner.createVisionInstance(
+        ImageSegmenter, wasmFileset, {baseOptions: {modelAssetBuffer}});
   }
 
   /**
@@ -106,9 +107,8 @@ export class ImageSegmenter extends VisionTaskRunner {
   static createFromModelPath(
       wasmFileset: WasmFileset,
       modelAssetPath: string): Promise<ImageSegmenter> {
-    return VisionTaskRunner.createInstance(
-        ImageSegmenter, /* initializeCanvas= */ true, wasmFileset,
-        {baseOptions: {modelAssetPath}});
+    return VisionTaskRunner.createVisionInstance(
+        ImageSegmenter, wasmFileset, {baseOptions: {modelAssetPath}});
   }
 
   /** @hideconstructor */
@@ -123,7 +123,6 @@ export class ImageSegmenter extends VisionTaskRunner {
     this.options.setSegmenterOptions(this.segmenterOptions);
     this.options.setBaseOptions(new BaseOptionsProto());
   }
-
 
   protected override get baseOptions(): BaseOptionsProto {
     return this.options.getBaseOptions()!;
@@ -152,15 +151,50 @@ export class ImageSegmenter extends VisionTaskRunner {
       this.options.clearDisplayNamesLocale();
     }
 
-    if (options.outputType === 'CONFIDENCE_MASK') {
-      this.segmenterOptions.setOutputType(
-          SegmenterOptionsProto.OutputType.CONFIDENCE_MASK);
-    } else {
-      this.segmenterOptions.setOutputType(
-          SegmenterOptionsProto.OutputType.CATEGORY_MASK);
+    if ('outputCategoryMask' in options) {
+      this.outputCategoryMask =
+          options.outputCategoryMask ?? DEFAULT_OUTPUT_CATEGORY_MASK;
+    }
+
+    if ('outputConfidenceMasks' in options) {
+      this.outputConfidenceMasks =
+          options.outputConfidenceMasks ?? DEFAULT_OUTPUT_CONFIDENCE_MASKS;
     }
 
     return super.applyOptions(options);
+  }
+
+  protected override onGraphRefreshed(): void {
+    this.populateLabels();
+  }
+
+  /**
+   * Populate the labelMap in TensorsToSegmentationCalculator to labels field.
+   * @throws Exception if there is an error during finding
+   *     TensorsToSegmentationCalculator.
+   */
+  private populateLabels(): void {
+    const graphConfig = this.getCalculatorGraphConfig();
+    const tensorsToSegmentationCalculators = graphConfig.getNodeList().filter(
+        (n: CalculatorGraphConfig.Node) =>
+            n.getName().includes(TENSORS_TO_SEGMENTATION_CALCULATOR_NAME));
+
+    this.labels = [];
+    if (tensorsToSegmentationCalculators.length > 1) {
+      throw new Error(`The graph has more than one ${
+          TENSORS_TO_SEGMENTATION_CALCULATOR_NAME}.`);
+    } else if (tensorsToSegmentationCalculators.length === 1) {
+      const labelItems =
+          tensorsToSegmentationCalculators[0]
+              .getOptions()
+              ?.getExtension(TensorsToSegmentationCalculatorOptions.ext)
+              ?.getLabelItemsMap() ??
+          new Map<string, LabelMapItem>();
+      labelItems.forEach((value, index) => {
+        // tslint:disable-next-line:no-unnecessary-type-assertion
+        this.labels[Number(index)] = value.getName()!;
+      });
+    }
   }
 
   /**
@@ -174,7 +208,7 @@ export class ImageSegmenter extends VisionTaskRunner {
    *    lifetime of the returned data is only guaranteed for the duration of the
    *    callback.
    */
-  segment(image: ImageSource, callback: SegmentationMaskCallback): void;
+  segment(image: ImageSource, callback: ImageSegmenterCallback): void;
   /**
    * Performs image segmentation on the provided single image and invokes the
    * callback with the response. The method returns synchronously once the
@@ -190,22 +224,24 @@ export class ImageSegmenter extends VisionTaskRunner {
    */
   segment(
       image: ImageSource, imageProcessingOptions: ImageProcessingOptions,
-      callback: SegmentationMaskCallback): void;
+      callback: ImageSegmenterCallback): void;
   segment(
       image: ImageSource,
       imageProcessingOptionsOrCallback: ImageProcessingOptions|
-      SegmentationMaskCallback,
-      callback?: SegmentationMaskCallback): void {
+      ImageSegmenterCallback,
+      callback?: ImageSegmenterCallback): void {
     const imageProcessingOptions =
         typeof imageProcessingOptionsOrCallback !== 'function' ?
         imageProcessingOptionsOrCallback :
         {};
-
-    this.userCallback = typeof imageProcessingOptionsOrCallback === 'function' ?
+    const userCallback =
+        typeof imageProcessingOptionsOrCallback === 'function' ?
         imageProcessingOptionsOrCallback :
         callback!;
+
+    this.reset();
     this.processImageData(image, imageProcessingOptions);
-    this.userCallback = () => {};
+    userCallback(this.result);
   }
 
   /**
@@ -222,7 +258,7 @@ export class ImageSegmenter extends VisionTaskRunner {
    */
   segmentForVideo(
       videoFrame: ImageSource, timestamp: number,
-      callback: SegmentationMaskCallback): void;
+      callback: ImageSegmenterCallback): void;
   /**
    * Performs image segmentation on the provided video frame and invokes the
    * callback with the response. The method returns synchronously once the
@@ -239,12 +275,12 @@ export class ImageSegmenter extends VisionTaskRunner {
    */
   segmentForVideo(
       videoFrame: ImageSource, imageProcessingOptions: ImageProcessingOptions,
-      timestamp: number, callback: SegmentationMaskCallback): void;
+      timestamp: number, callback: ImageSegmenterCallback): void;
   segmentForVideo(
       videoFrame: ImageSource,
       timestampOrImageProcessingOptions: number|ImageProcessingOptions,
-      timestampOrCallback: number|SegmentationMaskCallback,
-      callback?: SegmentationMaskCallback): void {
+      timestampOrCallback: number|ImageSegmenterCallback,
+      callback?: ImageSegmenterCallback): void {
     const imageProcessingOptions =
         typeof timestampOrImageProcessingOptions !== 'number' ?
         timestampOrImageProcessingOptions :
@@ -252,12 +288,32 @@ export class ImageSegmenter extends VisionTaskRunner {
     const timestamp = typeof timestampOrImageProcessingOptions === 'number' ?
         timestampOrImageProcessingOptions :
         timestampOrCallback as number;
-
-    this.userCallback = typeof timestampOrCallback === 'function' ?
+    const userCallback = typeof timestampOrCallback === 'function' ?
         timestampOrCallback :
         callback!;
+
+    this.reset();
     this.processVideoData(videoFrame, imageProcessingOptions, timestamp);
-    this.userCallback = () => {};
+    userCallback(this.result);
+  }
+
+  /**
+   * Get the category label list of the ImageSegmenter can recognize. For
+   * `CATEGORY_MASK` type, the index in the category mask corresponds to the
+   * category in the label list. For `CONFIDENCE_MASK` type, the output mask
+   * list at index corresponds to the category in the label list.
+   *
+   * If there is no labelmap provided in the model file, empty label array is
+   * returned.
+   *
+   * @return The labels used by the current model.
+   */
+  getLabels(): string[] {
+    return this.labels;
+  }
+
+  private reset(): void {
+    this.result = {width: 0, height: 0};
   }
 
   /** Updates the MediaPipe graph configuration. */
@@ -265,36 +321,56 @@ export class ImageSegmenter extends VisionTaskRunner {
     const graphConfig = new CalculatorGraphConfig();
     graphConfig.addInputStream(IMAGE_STREAM);
     graphConfig.addInputStream(NORM_RECT_STREAM);
-    graphConfig.addOutputStream(GROUPED_SEGMENTATIONS_STREAM);
 
     const calculatorOptions = new CalculatorOptions();
     calculatorOptions.setExtension(
         ImageSegmenterGraphOptionsProto.ext, this.options);
 
     const segmenterNode = new CalculatorGraphConfig.Node();
-    segmenterNode.setCalculator(IMAGEA_SEGMENTER_GRAPH);
+    segmenterNode.setCalculator(IMAGE_SEGMENTER_GRAPH);
     segmenterNode.addInputStream('IMAGE:' + IMAGE_STREAM);
     segmenterNode.addInputStream('NORM_RECT:' + NORM_RECT_STREAM);
-    segmenterNode.addOutputStream(
-        'GROUPED_SEGMENTATION:' + GROUPED_SEGMENTATIONS_STREAM);
     segmenterNode.setOptions(calculatorOptions);
 
     graphConfig.addNode(segmenterNode);
 
-    this.graphRunner.attachImageVectorListener(
-        GROUPED_SEGMENTATIONS_STREAM, (masks, timestamp) => {
-          if (masks.length === 0) {
-            this.userCallback([], 0, 0);
-          } else {
-            this.userCallback(
-                masks.map(m => m.data), masks[0].width, masks[0].height);
-          }
-          this.setLatestOutputTimestamp(timestamp);
-        });
-    this.graphRunner.attachEmptyPacketListener(
-        GROUPED_SEGMENTATIONS_STREAM, timestamp => {
-          this.setLatestOutputTimestamp(timestamp);
-        });
+    if (this.outputConfidenceMasks) {
+      graphConfig.addOutputStream(CONFIDENCE_MASKS_STREAM);
+      segmenterNode.addOutputStream(
+          'CONFIDENCE_MASKS:' + CONFIDENCE_MASKS_STREAM);
+
+      this.graphRunner.attachImageVectorListener(
+          CONFIDENCE_MASKS_STREAM, (masks, timestamp) => {
+            this.result.confidenceMasks = masks.map(m => m.data);
+            if (masks.length >= 0) {
+              this.result.width = masks[0].width;
+              this.result.height = masks[0].height;
+            }
+
+            this.setLatestOutputTimestamp(timestamp);
+          });
+      this.graphRunner.attachEmptyPacketListener(
+          CONFIDENCE_MASKS_STREAM, timestamp => {
+            this.setLatestOutputTimestamp(timestamp);
+          });
+    }
+
+    if (this.outputCategoryMask) {
+      graphConfig.addOutputStream(CATEGORY_MASK_STREAM);
+      segmenterNode.addOutputStream('CATEGORY_MASK:' + CATEGORY_MASK_STREAM);
+
+      this.graphRunner.attachImageListener(
+          CATEGORY_MASK_STREAM, (mask, timestamp) => {
+            this.result.categoryMask = mask.data;
+            this.result.width = mask.width;
+            this.result.height = mask.height;
+            this.setLatestOutputTimestamp(timestamp);
+          });
+      this.graphRunner.attachEmptyPacketListener(
+          CATEGORY_MASK_STREAM, timestamp => {
+            this.setLatestOutputTimestamp(timestamp);
+          });
+    }
 
     const binaryGraph = graphConfig.serializeBinary();
     this.setGraph(new Uint8Array(binaryGraph), /* isBinary= */ true);

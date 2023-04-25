@@ -1,5 +1,6 @@
 ---
-layout: default
+layout: forward
+target: https://developers.google.com/mediapipe/framework/framework_concepts/graphs
 title: Graphs
 parent: Framework Concepts
 nav_order: 2
@@ -11,6 +12,12 @@ nav_order: 2
 1. TOC
 {:toc}
 ---
+
+**Attention:** *Thanks for your interest in MediaPipe! We have moved to
+[https://developers.google.com/mediapipe](https://developers.google.com/mediapipe)
+as the primary developer documentation site for MediaPipe as of April 3, 2023.*
+
+----
 
 ## Graph
 
@@ -266,7 +273,7 @@ defined in the enclosing protobuf in order to be traversed using
 
 ## Cycles
 
-<!-- TODO: add discussion of PreviousLoopbackCalculator -->
+<!-- TODO -->
 
 By default, MediaPipe requires calculator graphs to be acyclic and treats cycles
 in a graph as errors. If a graph is intended to have cycles, the cycles need to

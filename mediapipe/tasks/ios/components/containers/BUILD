@@ -1,4 +1,4 @@
-# Copyright 2023 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2023 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,4 +43,20 @@ objc_library(
     srcs = ["sources/MPPEmbeddingResult.m"],
     hdrs = ["sources/MPPEmbeddingResult.h"],
     deps = [":MPPEmbedding"],
+)
+
+objc_library(
+    name = "MPPDetection",
+    srcs = ["sources/MPPDetection.m"],
+    hdrs = ["sources/MPPDetection.h"],
+    deps = [
+        ":MPPCategory",
+        "//third_party/apple_frameworks:UIKit",
+    ],
+)
+
+objc_library(
+    name = "MPPLandmark",
+    srcs = ["sources/MPPLandmark.m"],
+    hdrs = ["sources/MPPLandmark.h"],
 )

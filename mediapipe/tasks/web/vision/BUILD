@@ -19,12 +19,19 @@ mediapipe_files(srcs = [
 
 VISION_LIBS = [
     "//mediapipe/tasks/web/core:fileset_resolver",
+    "//mediapipe/tasks/web/vision/core:drawing_utils",
+    "//mediapipe/tasks/web/vision/core:image",
+    "//mediapipe/tasks/web/vision/face_detector",
+    "//mediapipe/tasks/web/vision/face_landmarker",
+    "//mediapipe/tasks/web/vision/face_stylizer",
     "//mediapipe/tasks/web/vision/gesture_recognizer",
     "//mediapipe/tasks/web/vision/hand_landmarker",
     "//mediapipe/tasks/web/vision/image_classifier",
     "//mediapipe/tasks/web/vision/image_embedder",
     "//mediapipe/tasks/web/vision/image_segmenter",
+    "//mediapipe/tasks/web/vision/interactive_segmenter",
     "//mediapipe/tasks/web/vision/object_detector",
+    "//mediapipe/tasks/web/vision/pose_landmarker",
 ]
 
 mediapipe_ts_library(

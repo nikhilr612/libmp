@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,6 +59,12 @@ def get_output_tensor_types(
     index = subgraph.Outputs(i)
     tensor_types.append(subgraph.Tensors(index).Type())
   return tensor_types
+
+
+def get_output_tensor_indices(model_buffer: bytearray) -> List[int]:
+  """Gets a list of the output tensor indices."""
+  subgraph = get_subgraph(model_buffer)
+  return subgraph.OutputsAsNumpy()
 
 
 def get_subgraph(model_buffer: bytearray) -> _schema_fb.SubGraph:

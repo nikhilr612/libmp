@@ -22,9 +22,9 @@
 #include "mediapipe/framework/formats/tensor.h"
 #include "mediapipe/framework/mediapipe_profiling.h"
 #include "mediapipe/framework/port/ret_check.h"
-#include "tensorflow/lite/core/shims/c/c_api_types.h"
-#include "tensorflow/lite/core/shims/cc/interpreter.h"
-#include "tensorflow/lite/core/shims/cc/interpreter_builder.h"
+#include "tensorflow/lite/c/c_api_types.h"
+#include "tensorflow/lite/interpreter.h"
+#include "tensorflow/lite/interpreter_builder.h"
 #include "tensorflow/lite/string_util.h"
 
 #define PERFETTO_TRACK_EVENT_NAMESPACE mediapipe
@@ -33,8 +33,8 @@ namespace mediapipe {
 
 namespace {
 
-using Interpreter = ::tflite_shims::Interpreter;
-using InterpreterBuilder = ::tflite_shims::InterpreterBuilder;
+using Interpreter = ::tflite::Interpreter;
+using InterpreterBuilder = ::tflite::InterpreterBuilder;
 
 template <typename T>
 void CopyTensorBufferToInterpreter(const Tensor& input_tensor,
@@ -160,16 +160,16 @@ absl::StatusOr<std::vector<Tensor>> InferenceInterpreterDelegateRunner::Run(
             Tensor::ElementType::kUInt8, shape,
             Tensor::QuantizationParameters{tensor->params.scale,
                                            tensor->params.zero_point});
-        CopyTensorBufferFromInterpreter<uint8>(interpreter_.get(), i,
-                                               &output_tensors.back());
+        CopyTensorBufferFromInterpreter<uint8_t>(interpreter_.get(), i,
+                                                 &output_tensors.back());
         break;
       case TfLiteType::kTfLiteInt8:
         output_tensors.emplace_back(
             Tensor::ElementType::kInt8, shape,
             Tensor::QuantizationParameters{tensor->params.scale,
                                            tensor->params.zero_point});
-        CopyTensorBufferFromInterpreter<int8>(interpreter_.get(), i,
-                                              &output_tensors.back());
+        CopyTensorBufferFromInterpreter<int8_t>(interpreter_.get(), i,
+                                                &output_tensors.back());
         break;
       case TfLiteType::kTfLiteInt32:
         output_tensors.emplace_back(Tensor::ElementType::kInt32, shape);

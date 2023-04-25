@@ -1,5 +1,5 @@
 /**
- * Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+ * Copyright 2022 The MediaPipe Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -138,6 +138,18 @@ describe('GestureRecognizer', () => {
     verifyGraph(gestureRecognizer, [
       ['handLandmarkerGraphOptions', 'handDetectorGraphOptions', 'numHands'], 1
     ]);
+    verifyGraph(gestureRecognizer, [
+      [
+        'handLandmarkerGraphOptions', 'handDetectorGraphOptions',
+        'minDetectionConfidence'
+      ],
+      0.5
+    ]);
+  });
+
+  it('does not reset default values when not specified', async () => {
+    await gestureRecognizer.setOptions({minHandDetectionConfidence: 0.5});
+    await gestureRecognizer.setOptions({});
     verifyGraph(gestureRecognizer, [
       [
         'handLandmarkerGraphOptions', 'handDetectorGraphOptions',

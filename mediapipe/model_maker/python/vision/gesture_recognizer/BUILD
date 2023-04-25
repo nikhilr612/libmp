@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package(
     default_visibility = ["//mediapipe:__subpackages__"],
 )
 
-# TODO: Remove the unncessary test data once the demo data are moved to an open-sourced
+# TODO: Remove the unnecessary test data once the demo data are moved to an open-sourced
 # directory.
 filegroup(
     name = "testdata",

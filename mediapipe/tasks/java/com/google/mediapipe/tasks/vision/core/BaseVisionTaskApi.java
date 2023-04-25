@@ -1,4 +1,4 @@
-// Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+// Copyright 2022 The MediaPipe Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ import java.util.Map;
 /** The base class of MediaPipe vision tasks. */
 public class BaseVisionTaskApi implements AutoCloseable {
   private static final long MICROSECONDS_PER_MILLISECOND = 1000;
-  private final TaskRunner runner;
-  private final RunningMode runningMode;
-  private final String imageStreamName;
-  private final String normRectStreamName;
+  protected final TaskRunner runner;
+  protected final RunningMode runningMode;
+  protected final String imageStreamName;
+  protected final String normRectStreamName;
 
   static {
     System.loadLibrary("mediapipe_tasks_vision_jni");
@@ -79,7 +79,9 @@ public class BaseVisionTaskApi implements AutoCloseable {
     inputPackets.put(imageStreamName, runner.getPacketCreator().createImage(image));
     inputPackets.put(
         normRectStreamName,
-        runner.getPacketCreator().createProto(convertToNormalizedRect(imageProcessingOptions)));
+        runner
+            .getPacketCreator()
+            .createProto(convertToNormalizedRect(imageProcessingOptions, image)));
     return runner.process(inputPackets);
   }
 
@@ -105,7 +107,9 @@ public class BaseVisionTaskApi implements AutoCloseable {
     inputPackets.put(imageStreamName, runner.getPacketCreator().createImage(image));
     inputPackets.put(
         normRectStreamName,
-        runner.getPacketCreator().createProto(convertToNormalizedRect(imageProcessingOptions)));
+        runner
+            .getPacketCreator()
+            .createProto(convertToNormalizedRect(imageProcessingOptions, image)));
     return runner.process(inputPackets, timestampMs * MICROSECONDS_PER_MILLISECOND);
   }
 
@@ -131,7 +135,9 @@ public class BaseVisionTaskApi implements AutoCloseable {
     inputPackets.put(imageStreamName, runner.getPacketCreator().createImage(image));
     inputPackets.put(
         normRectStreamName,
-        runner.getPacketCreator().createProto(convertToNormalizedRect(imageProcessingOptions)));
+        runner
+            .getPacketCreator()
+            .createProto(convertToNormalizedRect(imageProcessingOptions, image)));
     runner.send(inputPackets, timestampMs * MICROSECONDS_PER_MILLISECOND);
   }
 
@@ -145,17 +151,31 @@ public class BaseVisionTaskApi implements AutoCloseable {
    * Converts an {@link ImageProcessingOptions} instance into a {@link NormalizedRect} protobuf
    * message.
    */
-  private static NormalizedRect convertToNormalizedRect(
-      ImageProcessingOptions imageProcessingOptions) {
+  protected static NormalizedRect convertToNormalizedRect(
+      ImageProcessingOptions imageProcessingOptions, MPImage image) {
     RectF regionOfInterest =
         imageProcessingOptions.regionOfInterest().isPresent()
             ? imageProcessingOptions.regionOfInterest().get()
             : new RectF(0, 0, 1, 1);
+    // For 90° and 270° rotations, we need to swap width and height.
+    // This is due to the internal behavior of ImageToTensorCalculator, which:
+    // - first denormalizes the provided rect by multiplying the rect width or
+    //   height by the image width or height, repectively.
+    // - then rotates this by denormalized rect by the provided rotation, and
+    //   uses this for cropping,
+    // - then finally rotates this back.
+    boolean requiresSwap = imageProcessingOptions.rotationDegrees() % 180 != 0;
     return NormalizedRect.newBuilder()
         .setXCenter(regionOfInterest.centerX())
         .setYCenter(regionOfInterest.centerY())
-        .setWidth(regionOfInterest.width())
-        .setHeight(regionOfInterest.height())
+        .setWidth(
+            requiresSwap
+                ? regionOfInterest.height() * image.getHeight() / image.getWidth()
+                : regionOfInterest.width())
+        .setHeight(
+            requiresSwap
+                ? regionOfInterest.width() * image.getWidth() / image.getHeight()
+                : regionOfInterest.height())
         // Convert to radians anti-clockwise.
         .setRotation(-(float) Math.PI * imageProcessingOptions.rotationDegrees() / 180.0f)
         .build();

@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ py_test(
     data = [
         "//mediapipe/tasks/testdata/text:mobilebert_embedding_model",
         "//mediapipe/tasks/testdata/text:regex_embedding_with_metadata",
+        "//mediapipe/tasks/testdata/text:universal_sentence_encoder_qa",
     ],
     deps = [
         "//mediapipe/tasks/python/components/containers:embedding_result",

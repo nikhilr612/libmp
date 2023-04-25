@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ from __future__ import division
 from __future__ import print_function
 
 import functools
-from typing import Callable, Optional, Tuple, TypeVar
+from typing import Any, Callable, Optional, Tuple, TypeVar
 
 # Dependency imports
 import tensorflow as tf
@@ -66,12 +66,14 @@ class Dataset(object):
     """
     return self._size
 
-  def gen_tf_dataset(self,
-                     batch_size: int = 1,
-                     is_training: bool = False,
-                     shuffle: bool = False,
-                     preprocess: Optional[Callable[..., bool]] = None,
-                     drop_remainder: bool = False) -> tf.data.Dataset:
+  def gen_tf_dataset(
+      self,
+      batch_size: int = 1,
+      is_training: bool = False,
+      shuffle: bool = False,
+      preprocess: Optional[Callable[..., Any]] = None,
+      drop_remainder: bool = False,
+  ) -> tf.data.Dataset:
     """Generates a batched tf.data.Dataset for training/evaluation.
 
     Args:
@@ -82,7 +84,7 @@ class Dataset(object):
         create randomness during model training.
       preprocess: A function taking three arguments in order, feature, label and
         boolean is_training.
-      drop_remainder: boolean, whether the finaly batch drops remainder.
+      drop_remainder: boolean, whether the finally batch drops remainder.
 
     Returns:
       A TF dataset ready to be consumed by Keras model.

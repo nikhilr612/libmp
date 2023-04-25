@@ -24,7 +24,7 @@
 #include "mediapipe/calculators/tensor/inference_calculator_utils.h"
 #include "mediapipe/calculators/tensor/inference_interpreter_delegate_runner.h"
 #include "mediapipe/calculators/tensor/inference_runner.h"
-#include "tensorflow/lite/core/shims/cc/interpreter.h"
+#include "tensorflow/lite/interpreter.h"
 #if defined(MEDIAPIPE_ANDROID)
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #endif  // ANDROID
@@ -151,8 +151,6 @@ InferenceCalculatorCpuImpl::MaybeCreateDelegate(CalculatorContext* cc) {
     auto xnnpack_opts = TfLiteXNNPackDelegateOptionsDefault();
     xnnpack_opts.num_threads =
         GetXnnpackNumThreads(opts_has_delegate, opts_delegate);
-    // TODO Remove once XNNPACK is enabled by default.
-    xnnpack_opts.flags |= TFLITE_XNNPACK_DELEGATE_FLAG_QU8;
     return TfLiteDelegatePtr(TfLiteXNNPackDelegateCreate(&xnnpack_opts),
                              &TfLiteXNNPackDelegateDelete);
   }

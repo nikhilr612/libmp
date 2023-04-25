@@ -15,19 +15,24 @@ mediapipe_ts_library(
         "//mediapipe/framework:calculator_jspb_proto",
         "//mediapipe/framework:calculator_options_jspb_proto",
         "//mediapipe/tasks/cc/core/proto:base_options_jspb_proto",
+        "//mediapipe/tasks/cc/vision/image_segmenter/calculators:tensors_to_segmentation_calculator_jspb_proto",
         "//mediapipe/tasks/cc/vision/image_segmenter/proto:image_segmenter_graph_options_jspb_proto",
         "//mediapipe/tasks/cc/vision/image_segmenter/proto:segmenter_options_jspb_proto",
         "//mediapipe/tasks/web/core",
         "//mediapipe/tasks/web/vision/core:image_processing_options",
+        "//mediapipe/tasks/web/vision/core:types",
         "//mediapipe/tasks/web/vision/core:vision_task_runner",
-        "//mediapipe/web/graph_runner:graph_runner_image_lib_ts",
+        "//mediapipe/util:label_map_jspb_proto",
         "//mediapipe/web/graph_runner:graph_runner_ts",
     ],
 )
 
 mediapipe_ts_declaration(
     name = "image_segmenter_types",
-    srcs = ["image_segmenter_options.d.ts"],
+    srcs = [
+        "image_segmenter_options.d.ts",
+        "image_segmenter_result.d.ts",
+    ],
     deps = [
         "//mediapipe/tasks/web/core",
         "//mediapipe/tasks/web/core:classifier_options",

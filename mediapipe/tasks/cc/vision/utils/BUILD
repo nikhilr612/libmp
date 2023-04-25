@@ -1,4 +1,4 @@
-# Copyright 2022 The MediaPipe Authors. All Rights Reserved.
+# Copyright 2022 The MediaPipe Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ cc_library_with_tflite(
     tflite_deps = [
         "//mediapipe/tasks/cc/core:model_resources",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//mediapipe/framework/port:integral_types",
         "//mediapipe/framework/port:status",
@@ -49,7 +50,7 @@ cc_test_with_tflite(
     tflite_deps = [
         ":image_tensor_specs",
         "//mediapipe/tasks/cc/core:model_resources",
-        "@org_tensorflow//tensorflow/lite/core/shims:cc_shims_test_util",
+        "@org_tensorflow//tensorflow/lite:test_util",
     ],
     deps = [
         "//mediapipe/framework/deps:file_path",
