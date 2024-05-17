@@ -1,4 +1,3 @@
-#include "libmp.h"
 #include "libmp_impl.h"
 #include "mediapipe/framework/formats/image_frame.h"
 

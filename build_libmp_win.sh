@@ -3,7 +3,7 @@ export BAZEL_VS='C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools'
 # Use double slashes
 # Note: Bazel requires NumPy (and potentially other packages?)
 # A new conda environment with numpy installed (`conda install numpy`) has been tested and works
-export PYTHON_BIN_PATH='C:\\Users\\rk274\\AppData\\Local\\miniconda3\\envs\\bazel_mp\\python.exe'
+export PYTHON_BIN_PATH='C:/Users/nikhi/miniconda3/envs/libmp_pyenv/python.exe'
 
 # Optional vars
 # export BAZEL_VC_FULL_VERSION="14.33.31629"
